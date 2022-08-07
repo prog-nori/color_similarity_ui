@@ -22,6 +22,7 @@ import {
     ViewComfyRounded
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
+import { useWindowSize } from '../util'
 
 type Blocks = {
     file: string
@@ -42,6 +43,8 @@ export const BlocksPage: FC = () => {
     const [blocks, setBlocks] = useState<Blocks[] | []>([])
     const [length, setLength] = useState<number>(0)
     const [currentPage, setCurrentPage] = useState<number>(Number(page))
+    const {width} = useWindowSize()
+    // const [navWidth, setNavWidth] = useState<number>(width || window.innerWidth)
     const size = 64
     const navigationStyle: CSSProperties = {position: 'sticky', top: 0}
     axios.defaults.baseURL = 'http://localhost:5000';
@@ -112,35 +115,10 @@ export const BlocksPage: FC = () => {
                                     )
                                 )
                             }
-
-
-                            {/* <TableRow>
-                                <TableColumn />
-                                <TableColumn>
-                                <svg width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-                                    <image xlinkHref="http://localhost:5000/images/svg/textures/block/weathered_cut_copper.svg" width={size} height={size} />
-                                </svg>
-                                </TableColumn>
-                                <TableColumn>RGB(0, 0, 0)</TableColumn>
-                                <TableColumn>HSV(0, 0, 0)</TableColumn>
-                                <TableColumn>/path/to/dir</TableColumn>
-                            </TableRow>
-                            <TableRow>
-                                <TableColumn />
-                                <TableColumn>
-                                <svg width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-                                    <image xlinkHref="http://localhost:5000/images/svg/textures/block/weathered_cut_copper.svg" width={size} height={size} />
-                                </svg>
-                                </TableColumn>
-                                <TableColumn>RGB(0, 0, 0)</TableColumn>
-                                <TableColumn>HSV(0, 0, 0)</TableColumn>
-                                <TableColumn>/path/to/dir</TableColumn>
-                            </TableRow> */}
                         </tbody>
                     </Table>
                 </VerticalBox>
-                <BottomNavigation>
-                    {/* うんち */}
+                <BottomNavigation style={{width: `${width - 384}px`}}>
                     <Pagination
                         count={Math.ceil(length / size)}
                         size="large"

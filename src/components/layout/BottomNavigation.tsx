@@ -1,9 +1,9 @@
 import {
-    FC,
-    ReactNode
+    FC
 } from 'react'
 import styled from 'styled-components'
 import { HorizontalBox } from './HorizontalBox'
+import { BlockDefaultProps } from '../../models'
 
 const Nav = styled.nav`
     position: fixed;
@@ -21,11 +21,12 @@ const Nav = styled.nav`
     transition: width .2s;
 `
 
-export const BottomNavigation: FC<{ children: ReactNode }> = ({
+export const BottomNavigation: FC<BlockDefaultProps> = ({
+    style,
     children
 }) => {
     return (
-        <Nav>
+        <Nav style={style}>
             <HorizontalBox style={{justifyContent: 'center'}}>
                 {children}
             </HorizontalBox>
