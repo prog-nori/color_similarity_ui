@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react'
+import { CSSProperties, FC, ReactNode } from 'react'
 import styled from 'styled-components'
 
 const StyledTD = styled.td`
@@ -9,9 +9,17 @@ padding: 8px 16px;
 } */
 `
 
-export const TableColumn: FC<{children?: ReactNode }> = ({children}) => {
+export const TableColumn: FC<{
+    style?: CSSProperties,
+    onClick?: (event: any) => void,
+    children?: ReactNode
+}> = ({
+    style,
+    onClick,
+    children
+}) => {
     return (
-        <StyledTD>
+        <StyledTD style={style} onClick={onClick}>
             {children}
         </StyledTD>
     )

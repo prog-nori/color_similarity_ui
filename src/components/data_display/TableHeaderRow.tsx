@@ -4,6 +4,7 @@ import styled from 'styled-components'
 const StyledTableRow = styled.tr`
     width: 100%;
     background: #fffffe;
+    border-bottom: solid 1px #ccc;
 `
 
 export const TableHeaderRow: FC<{children: ReactNode }> = ({children}) => {
