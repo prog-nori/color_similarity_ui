@@ -57,11 +57,11 @@ export const BlocksPage: FC = () => {
     const svgSize = 40
     const limit = 50
     const navigationStyle: CSSProperties = {position: 'sticky', top: 0}
-    axios.defaults.baseURL = 'http://localhost:5000';
+    axios.defaults.baseURL = 'http://REACT_APP_API_BASE_URL';
     axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
     useEffect(() => {
-        axios.get(`http://localhost:5000/servicies/v2/blocks/${page}`)
+        axios.get(`http://REACT_APP_API_BASE_URL/servicies/v2/blocks/${page}`)
         .then(status => {
             if(status.data !== undefined) {
                 setBlocks(status.data.blocks)
@@ -132,7 +132,7 @@ export const BlocksPage: FC = () => {
                                                 // background: '#79797979',
                                                 textAlign: 'center'}}>
                                             <svg width={svgSize} height={svgSize} xmlns="http://www.w3.org/2000/svg">
-                                                <image xlinkHref={'http://localhost:5000/' + aBlock.file} width={svgSize} height={svgSize} />
+                                                <image xlinkHref={'http://REACT_APP_API_BASE_URL/' + aBlock.file} width={svgSize} height={svgSize} />
                                             </svg>
                                             </TableColumn>
                                             <TableColumn onClick={() => { console.log(mainRef) }}>{aBlock.rgb}</TableColumn>
