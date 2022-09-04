@@ -14,7 +14,7 @@ import {
     Logo,
     InputTypeFile,
     SubmitButton,
-    // Notification
+    Notification
 } from '../parts'
 import { Grid, Navigation } from '../templates'
 import { findBlocksByImage, uploadImage } from '../dao'
@@ -38,14 +38,28 @@ export const Search: FC = () => {
     let { identifier } = useParams()
     const navigate = useNavigate()
 
-    useEffect(() => console.log('identifier:', identifier), [])
+    useEffect(() => {
+        if(identifier && identifier !== 'undefined') {
+            searchImagesByIdentifier(identifier)
+        }
+        console.log('identifier:', identifier)
+    }, [])
 
     const [selectedFileName, setSelectedFileName] = useState<string>('')
     const [searchResult, setSearchResult] = useState<BlockType[]>([])
     const [searchTargetFile, setSearchTargetFile] = useState<File|undefined>(undefined)
-    // const [uploadSuccess, setUploadSuccess] = useState<boolean|undefined>(undefined)
-    // const [searchSuccess, setSearchSuccess] = useState<boolean|undefined>(undefined)
-    // const [filenameTooLongError, setFilenameTooLongError] = useState<boolean>(false)
+    const [uploadSuccess, setUploadSuccess] = useState<boolean|undefined>(undefined)
+    const [searchSuccess, setSearchSuccess] = useState<boolean|undefined>(undefined)
+
+    const searchImagesByIdentifier = (identifier: string) => {
+        findBlocksByImage({identifier: identifier})
+        .then((res: FindResponse) => {
+            setSearchResult(res.similars)
+        })
+        .catch(e => {
+            console.log(e)
+        })
+    }
 
     const handleFileSelected = (e: ChangeEvent<unknown>) => {
         e.preventDefault()
@@ -64,31 +78,18 @@ export const Search: FC = () => {
         }
         const splittedFilePath = searchTargetFile.name.split('/')
         if(splittedFilePath[splittedFilePath.length - 1].length <= 60) {
-            // setFilenameTooLongError(false)
             uploadImage({file: searchTargetFile})
-                .then((res: UploadResponse) => {
-                    navigate(`/search/${res.id}`, {replace: true})
-                    window.scrollTo(0, 0)
-                    // setUploadSuccess(res.status === 200)
-                    if(res.status === 200 && res.id) {
-                        findBlocksByImage({identifier: res.id})
-                            .then((resp: FindResponse) => {
-                                // setSearchSuccess(true)
-                                setSearchResult(resp.similars)
-                                console.log(resp.similars)
-                            })
-                            .catch(e => {
-                                console.log(e)
-                            })
-                    }
-                })
-                .catch((err: UploadResponse) => {
-                    console.log({ status: err.status, message: err.message, filename: err.filename })
-                    // setUploadSuccess(false)
-                })
+            .then((res: UploadResponse) => {
+                navigate(`/search/${res.id}`, {replace: true})
+                window.scrollTo(0, 0)
+                setSearchSuccess(true)
+            })
+            .catch((err: UploadResponse) => {
+                setUploadSuccess(false)
+                console.log({ status: err.status, message: err.message, filename: err.filename })
+            })
         } else {
             console.log(`filename.length is over 60. is is ${splittedFilePath[splittedFilePath.length - 1].length}`)
-            // setFilenameTooLongError(true)
         }
     }
 
@@ -100,14 +101,9 @@ export const Search: FC = () => {
                     <Logo />
                 </header>
                 <main>
-                    {/* { uploadSuccess === false && <Notification type='err' isShow={true}>画像のアップロードに失敗しました</Notification> }
-                    { filenameTooLongError && <Notification type='err' isShow={true}>もうちょっと短いファイル名でお願いします（最大255文字）</Notification> }
-                    { searchSuccess && <Notification type='success' isShow={true}>検索に成功しました</Notification> } */}
+                    { uploadSuccess === false && <Notification type='err' isShow={true}>画像のアップロードに失敗しました</Notification> }
+                    { searchSuccess && <Notification type='success' isShow={true}>検索に成功しました</Notification> }
 
-                    {/* <Notification type='info' isShow={true}>infoテスト</Notification>
-                    <Notification type='success' isShow={true}>successテスト</Notification>
-                    <Notification type='warn' isShow={true}>warnテスト</Notification>
-                    <Notification type='err' isShow={true}>errorテスト</Notification> */}
                     <form
                         id='search-form'
                         name='search-form'
