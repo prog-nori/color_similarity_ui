@@ -10,7 +10,8 @@ const App: FC = () => {
         <Route path='/' element={ <Home /> } />
         {/* <Route path='/' element={ <TopPage /> } /> */}
         <Route path='/blocks/:page' element={ <Blocks /> } />
-        <Route path='/search/:identifier/:page' element={ <Search /> } />
+        <Route path='/search/:identifier' element={ <Search /> } />
+        {/* <Route path='/search/:identifier/:page' element={ <Search /> } /> */}
         <Route path='/search' element={ <Search /> } />
         {/* <Route path='/blocks/:page' element={ <BlocksPage /> } /> */}
         {/* <Route path='/find/:identifier/:page' element={ <FindPage /> } />

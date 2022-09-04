@@ -5,6 +5,7 @@ import {
     useEffect,
     useState } from 'react'
 import {
+    useNavigate,
     useParams,
 } from 'react-router-dom'
 
@@ -13,7 +14,7 @@ import {
     Logo,
     InputTypeFile,
     SubmitButton,
-    Notification
+    // Notification
 } from '../parts'
 import { Grid, Navigation } from '../templates'
 import { findBlocksByImage, uploadImage } from '../dao'
@@ -24,7 +25,8 @@ import '../assets/common/style/app.scss'
 type UploadResponse = {
     status: number,
     message?: string,
-    filename?: string
+    filename?: string,
+    id?: string
 }
 
 type FindResponse = {
@@ -33,15 +35,17 @@ type FindResponse = {
 }
 
 export const Search: FC = () => {
-    let { image } = useParams()
-    useEffect(() => console.log('image:', image), [image])
+    let { identifier } = useParams()
+    const navigate = useNavigate()
+
+    useEffect(() => console.log('identifier:', identifier), [])
 
     const [selectedFileName, setSelectedFileName] = useState<string>('')
     const [searchResult, setSearchResult] = useState<BlockType[]>([])
     const [searchTargetFile, setSearchTargetFile] = useState<File|undefined>(undefined)
-    const [uploadSuccess, setUploadSuccess] = useState<boolean|undefined>(undefined)
-    const [searchSuccess, setSearchSuccess] = useState<boolean|undefined>(undefined)
-    const [filenameTooLongError, setFilenameTooLongError] = useState<boolean>(false)
+    // const [uploadSuccess, setUploadSuccess] = useState<boolean|undefined>(undefined)
+    // const [searchSuccess, setSearchSuccess] = useState<boolean|undefined>(undefined)
+    // const [filenameTooLongError, setFilenameTooLongError] = useState<boolean>(false)
 
     const handleFileSelected = (e: ChangeEvent<unknown>) => {
         e.preventDefault()
@@ -60,15 +64,16 @@ export const Search: FC = () => {
         }
         const splittedFilePath = searchTargetFile.name.split('/')
         if(splittedFilePath[splittedFilePath.length - 1].length <= 60) {
-            setFilenameTooLongError(false)
+            // setFilenameTooLongError(false)
             uploadImage({file: searchTargetFile})
                 .then((res: UploadResponse) => {
-                    console.log({ status: res.status, message: res.message, filename: res.filename })
-                    setUploadSuccess(res.status === 200)
-                    if(res.status === 200 && res.filename) {
-                        findBlocksByImage({filename: res.filename})
+                    navigate(`/search/${res.id}`, {replace: true})
+                    window.scrollTo(0, 0)
+                    // setUploadSuccess(res.status === 200)
+                    if(res.status === 200 && res.id) {
+                        findBlocksByImage({identifier: res.id})
                             .then((resp: FindResponse) => {
-                                setSearchSuccess(true)
+                                // setSearchSuccess(true)
                                 setSearchResult(resp.similars)
                                 console.log(resp.similars)
                             })
@@ -79,11 +84,11 @@ export const Search: FC = () => {
                 })
                 .catch((err: UploadResponse) => {
                     console.log({ status: err.status, message: err.message, filename: err.filename })
-                    setUploadSuccess(false)
+                    // setUploadSuccess(false)
                 })
         } else {
             console.log(`filename.length is over 60. is is ${splittedFilePath[splittedFilePath.length - 1].length}`)
-            setFilenameTooLongError(true)
+            // setFilenameTooLongError(true)
         }
     }
 
@@ -95,9 +100,9 @@ export const Search: FC = () => {
                     <Logo />
                 </header>
                 <main>
-                    { uploadSuccess === false && <Notification type='err' isShow={true}>画像のアップロードに失敗しました</Notification> }
+                    {/* { uploadSuccess === false && <Notification type='err' isShow={true}>画像のアップロードに失敗しました</Notification> }
                     { filenameTooLongError && <Notification type='err' isShow={true}>もうちょっと短いファイル名でお願いします（最大255文字）</Notification> }
-                    { searchSuccess && <Notification type='success' isShow={true}>検索に成功しました</Notification> }
+                    { searchSuccess && <Notification type='success' isShow={true}>検索に成功しました</Notification> } */}
 
                     {/* <Notification type='info' isShow={true}>infoテスト</Notification>
                     <Notification type='success' isShow={true}>successテスト</Notification>

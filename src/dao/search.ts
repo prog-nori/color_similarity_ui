@@ -3,7 +3,7 @@ import { getApiPrefix } from './utility'
 import { BlockType } from '../dao/apiImpl'
 
 type FindProps = {
-    filename: string
+    identifier: string
 }
 
 type FindResponse = {
@@ -18,11 +18,12 @@ type UploadProps = {
 type UploadResponse = {
     status: number,
     message?: string,
-    filename?: string
+    filename?: string,
+    id?: string
 }
 
-export const findBlocksByImage = async ({filename}: FindProps): Promise<FindResponse> => {
-    const apiURL = getApiPrefix('find', filename)
+export const findBlocksByImage = async ({identifier}: FindProps): Promise<FindResponse> => {
+    const apiURL = getApiPrefix('find', identifier)
     return await axios.get(apiURL)
         .then((status: AxiosResponse<FindResponse>) => {
             const similars: BlockType[] = []
@@ -51,6 +52,7 @@ export const uploadImage = async ({file}: UploadProps): Promise<UploadResponse> 
         formData.append('image', file)
         return await axios.post(apiURL, formData)
             .then((status: AxiosResponse<UploadResponse>) => {
+                console.log(status)
                 return status.data
             })
             .catch(e => {
