@@ -20,9 +20,11 @@ export {
 
 export {
     Button,
+    ImagePreview,
     InputTypeFile,
     // InputTypeSubmit,
     InputTypeText,
+    OverlayWhenDragging,
     SubmitButton
 } from './Input'
 

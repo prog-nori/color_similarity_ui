@@ -1,20 +1,25 @@
 import {
     ChangeEvent,
+    DragEvent,
     FC,
     FormEvent,
+    useCallback,
     useEffect,
     useState } from 'react'
 import {
     useNavigate,
     useParams,
 } from 'react-router-dom'
+import { useDropzone } from 'react-dropzone'
 
 import {
     ListItem,
     Logo,
     InputTypeFile,
     SubmitButton,
-    Notification
+    Notification,
+    OverlayWhenDragging,
+    ImagePreview
 } from '../parts'
 import { Grid, Navigation } from '../templates'
 import { findBlocksByImage, uploadImage } from '../dao'
@@ -43,22 +48,47 @@ export const Search: FC = () => {
             searchImagesByIdentifier(identifier)
         }
         console.log('identifier:', identifier)
-    }, [])
+    }, [identifier])
 
     const [selectedFileName, setSelectedFileName] = useState<string>('')
     const [searchResult, setSearchResult] = useState<BlockType[]>([])
     const [searchTargetFile, setSearchTargetFile] = useState<File|undefined>(undefined)
     const [uploadSuccess, setUploadSuccess] = useState<boolean|undefined>(undefined)
     const [searchSuccess, setSearchSuccess] = useState<boolean|undefined>(undefined)
+    const [previewSrc, setPreviewSrc] = useState<string|undefined>()
+    const [activeDragEvent, setActiveDragEvent] = useState<boolean>(false)
+
+    const onDrop = useCallback((files: File[]) => {
+        const inputProps = getInputProps()
+        console.log('Files:', files)
+        console.log(inputProps)
+        if(files.length > 0) {
+            setSearchTargetFile(files[0])
+            setSelectedFileName(files[0].name)
+            setPreviewSrc(URL.createObjectURL(files[0]))
+        }
+        setActiveDragEvent(false)
+    }, [])
+
+    const {
+        getRootProps, getInputProps,
+    } = useDropzone({ onDrop });
 
     const searchImagesByIdentifier = (identifier: string) => {
         findBlocksByImage({identifier: identifier})
         .then((res: FindResponse) => {
             setSearchResult(res.similars)
+            setPreviewSrc(`${process.env.REACT_APP_API_BASE_URL}/${res.img}`)
         })
         .catch(e => {
             console.log(e)
         })
+    }
+
+    const handleDragOver = (e: DragEvent<HTMLDivElement>): void => {
+        e.stopPropagation()
+        e.preventDefault()
+        setActiveDragEvent(true)
     }
 
     const handleFileSelected = (e: ChangeEvent<unknown>) => {
@@ -67,6 +97,7 @@ export const Search: FC = () => {
         if(files.length > 0) {
             setSelectedFileName(files[0].name)
             setSearchTargetFile(files[0])
+            setPreviewSrc(URL.createObjectURL(files[0]))
         }
     }
 
@@ -94,7 +125,11 @@ export const Search: FC = () => {
     }
 
     return (
-        <div className="container">
+        <div className="container" onDragOver={handleDragOver}>
+            <OverlayWhenDragging
+                visible={activeDragEvent}
+                handleDragOver={handleDragOver}
+                getRootProps={getRootProps} />
             <Navigation />
             <div className="wrapper">
                 <header className="header">
@@ -110,47 +145,50 @@ export const Search: FC = () => {
                         className='row'
                         method='post'
                         onSubmit={handleSubmit}>
-                        <InputTypeFile
-                            name='image'
-                            label='画像ファイル'
-                            value={selectedFileName}
-                            onChange={handleFileSelected}
-                            accept={['image/png']}
-                            required
-                            />
+                        <div className="form-group">
+                            <InputTypeFile
+                                name='image'
+                                label='画像ファイル'
+                                value={selectedFileName}
+                                onChange={handleFileSelected}
+                                accept={['image/png']}
+                                // required
+                                />
+                            <ImagePreview src={previewSrc} />
+                        </div>
                         <SubmitButton withMarginTop>画像で検索</SubmitButton>
                     </form>
                     {
-                        searchResult.length > 0 && (
-                            <Grid column={1}>
-                                <div>
-                                    <div className="list-wrapper">
-                                        <ul>
-                                            {
-                                                searchResult && searchResult.map((aBlock: BlockType) => {
-                                                    const aPath = aBlock.file.split('.svg')[0]
-                                                    const splitted = aPath.split('/')
-                                                    const description = splitted[splitted.length - 1]
-                                                    return (
-                                                        <li key={description}>
-                                                            <div className="list-container">
-                                                                <div className="list-thumbnail">
-                                                                    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
-                                                                        <image xlinkHref={aBlock.file} width="40" height="40" />
-                                                                    </svg>
-                                                                </div>
-                                                                <ListItem description={description} fullWidth>{aBlock.name}</ListItem>
-                                                                <ListItem>{aBlock.rgb}</ListItem>
-                                                            </div>
-                                                        </li>
-                                                    )}
-                                                )
-                                            }
-                                        </ul>
-                                    </div>
+                    searchResult.length > 0 && (
+                        <Grid column={1}>
+                            <div>
+                                <div className="list-wrapper">
+                                    <ul>
+                                        {
+                                        searchResult && searchResult.map((aBlock: BlockType) => {
+                                            const aPath = aBlock.file.split('.svg')[0]
+                                            const splitted = aPath.split('/')
+                                            const description = splitted[splitted.length - 1]
+                                            return (
+                                                <li key={description}>
+                                                    <div className="list-container">
+                                                        <div className="list-thumbnail">
+                                                            <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+                                                                <image xlinkHref={aBlock.file} width="40" height="40" />
+                                                            </svg>
+                                                        </div>
+                                                        <ListItem description={description} fullWidth>{aBlock.name}</ListItem>
+                                                        <ListItem>{aBlock.rgb}</ListItem>
+                                                    </div>
+                                                </li>
+                                            )}
+                                        )
+                                        }
+                                    </ul>
                                 </div>
-                            </Grid>
-                        )
+                            </div>
+                        </Grid>
+                    )
                     }
                 </main>
             </div>

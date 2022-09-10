@@ -237,6 +237,12 @@ $hiragino-kaku-gothic: "ヒラギノ角ゴ ProN W6", "HiraKakuProN-W6", "ヒラ�
         justify-content: space-between;
         width: 100%;
     }
+    .form-group {
+        display: flex;
+        > div:not(:last-child) {
+            margin-right: 32px;
+        }
+    }
     .input-wrapper {
         display: flex;
         flex-direction: column;
@@ -280,7 +286,7 @@ $hiragino-kaku-gothic: "ヒラギノ角ゴ ProN W6", "HiraKakuProN-W6", "ヒラ�
             }
         }
     }
-    .input-button-wrapper {
+    .input-another-wrapper {
         &.with-margin-top {
             margin-top: 29px;
         }
@@ -304,6 +310,15 @@ $hiragino-kaku-gothic: "ヒラギノ角ゴ ProN W6", "HiraKakuProN-W6", "ヒラ�
                     background: rgba(0, 0, 0, 0.1);
                 }
             }
+        }
+        img, .dummy-img {
+            width: 40px;
+            height: 40px;
+            border: solid 1px #D9D9D9;
+            border-radius: $border-radius;
+        }
+        .dummy-img {
+            background: #D3D3D3;
         }
     }
     span.input-label {
@@ -354,5 +369,19 @@ $hiragino-kaku-gothic: "ヒラギノ角ゴ ProN W6", "HiraKakuProN-W6", "ヒラ�
                 margin-right: 16px;
             }
         }
+    }
+    .overlay-when-dragging {
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+        background-color: $accent-color;
+        color: #fff;
+        z-index: 999;
+        opacity: 0.7;
     }
 }

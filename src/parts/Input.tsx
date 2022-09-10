@@ -1,4 +1,6 @@
-import { ChangeEvent, FC, MouseEvent, ReactNode } from 'react'
+import { ChangeEvent, DragEvent, FC, MouseEvent, ReactNode } from 'react'
+import { ImageRounded } from '@mui/icons-material'
+import { DropzoneInputProps } from 'react-dropzone'
 
 type FormInputProps = {
     label: string,
@@ -6,6 +8,8 @@ type FormInputProps = {
     value?: string|number|boolean,
     placeholder?: string,
     onChange?: (e: ChangeEvent<unknown>) => void,
+    getRootProps?: any,
+    getInputProps?: <T extends DropzoneInputProps>(props?: T | undefined) => T,
     accept?: string[],
     required?: boolean
 }
@@ -35,6 +39,8 @@ export const InputTypeFile: FC<FormInputProps> = ({
     label,
     value,
     onChange,
+    // getRootProps,
+    // getInputProps,
     accept=[],
     required
 }) => {
@@ -48,6 +54,7 @@ export const InputTypeFile: FC<FormInputProps> = ({
                 </span>
                 <input
                 type="file"
+                // {...getInputProps()}
                 id={name}
                 name={name}
                 maxLength={60}
@@ -83,7 +90,7 @@ export const SubmitButton: FC<ButtonProps> = ({
     children,
     withMarginTop
 }) => {
-    const wrapperClassList=  ['input-button-wrapper']
+    const wrapperClassList=  ['input-another-wrapper']
     if(withMarginTop) {
         wrapperClassList.push('with-margin-top')
     }
@@ -106,7 +113,7 @@ export const Button: FC<ButtonProps & {
     type='button',
     withMarginTop
 }) => {
-    const wrapperClassList=  ['input-button-wrapper']
+    const wrapperClassList=  ['input-another-wrapper']
     if(withMarginTop) {
         wrapperClassList.push('with-margin-top')
     }
@@ -118,6 +125,50 @@ export const Button: FC<ButtonProps & {
             {/* <input type="submit" value={value} /> */}
         </div>
     )
+}
+
+export const ImagePreview: FC<{src?: string}> = ({src}) => {
+    const wrapperClassList=  ['input-another-wrapper', 'with-margin-top']
+    return (
+        <div className={wrapperClassList.join(' ')}>
+            {src && <img src={src} alt="" /> }
+            {!src && <div className='dummy-img' />}
+        </div>
+    )
+}
+
+type MyDragEvent = DragEvent<any>
+
+export const OverlayWhenDragging: FC<{
+    handleDragOver: (e: MyDragEvent) => void,
+    // handleDragLeave: (e: MyDragEvent) => void,
+    visible: boolean,
+    getRootProps?: any
+}> = ({
+    handleDragOver,
+    // handleDragLeave,
+    visible,
+    getRootProps
+}) => {
+    window.addEventListener('dragover', (e: any) => {
+        handleDragOver(e)
+    })
+    // window.addEventListener('dragleave', (e: any) => {
+    //     handleDragLeave(e)
+    // })
+    if(!getRootProps) {
+        return (
+            <div className='overlay-when-dragging' style={{display: visible? 'flex': 'none'}} >
+                <h1 style={{color: '#fff'}}><ImageRounded />Drag here...</h1>
+            </div>
+        )
+    } else {
+        return (
+            <div className='overlay-when-dragging' style={{display: visible? 'flex': 'none'}} {...getRootProps()} >
+                <h1 style={{color: '#fff'}}><ImageRounded />Drag here...</h1>
+            </div>
+        )
+    }
 }
 
 // input::radio
